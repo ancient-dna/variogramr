@@ -29,19 +29,24 @@ double mean_dist_pair(NumericVector y_i, NumericVector y_j) {
 
     // loop over features
     for (int k = 0; k < p; k++) {
+
         // check that both features are non-missing
-        if (!R_IsNA(y_i(k)) && !R_IsNA(y_j(k))) {
+        if ((!R_IsNA(y_i(k))) && (!R_IsNA(y_j(k)))) {
 
             // add to euclidian distiance
             d_ij = d_ij + pow((y_i(k) - y_j(k)), 2);
 
             // count non-missing features
             m = m + 1.0;
+
         }
+
     }
 
     // normalize by number of non-missing features
-    d_ij = d_ij / m;
+    if (m != 0.0) {
+        d_ij = d_ij / m;
+    }
 
     return d_ij;
 }

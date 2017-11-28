@@ -11,8 +11,9 @@ read_geno <- function(geno_path, n){
     df <- read_fwf(geno_path, progress=TRUE, na='9', fwf_widths(rep(1, n)))
     YT <- as.matrix(df)
     colnames(YT) <- NULL
+    Y <- t(YT)
 
-    return(t(YT))
+    return(Y)
 }
 
 #' @title Sample heterozygotes
