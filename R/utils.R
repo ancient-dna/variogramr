@@ -19,10 +19,13 @@ read_geno <- function(geno_path, n){
 #' @title Sample heterozygotes
 #'
 #' @param Y matrix n x p of genotypes
-#' @param idx row indicies of people you want to het sample
 #'
-#' @return Y_samp matrix of het sampled genotypes
+#' @return Y matrix of het sampled genotypes
 #' @export
-sample_hets <- function(Y, idx){
-    NULL
+sample_hets <- function(Y){
+    p <- sum(Y==1, na.rm=TRUE)
+    samps <- as.vector(sample(c(0, 2), size=p, replace=TRUE))
+    Y[!is.na(Y) & Y == 1] <- samps
+
+    return(Y)
 }

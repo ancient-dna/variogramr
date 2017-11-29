@@ -47,8 +47,12 @@ double mean_dist_pair(NumericVector y_i, NumericVector y_j) {
     if (m != 0.0) {
         d_ij = d_ij / m;
     }
+    else {
+        d_ij = NA_REAL;
+    }
 
     return d_ij;
+
 }
 
 //' @title Mean euclidean distance
@@ -73,11 +77,12 @@ NumericMatrix mean_dist(NumericMatrix y) {
     NumericMatrix d(n, n);
 
     // loop over all pairs of samples
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < (n - 1); i++) {
+        for (int j = (i+1); j < n; j++) {
 
             // compute distance for each pair
-            d(i, j) = mean_dist_pair(y(_, i), y(_, j));
+            d(i, j) = mean_dist_pair(y(i,_), y(j,_));
+            d(j, i) = d(i, j);
 
         }
     }

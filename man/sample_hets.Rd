@@ -4,13 +4,11 @@
 \alias{sample_hets}
 \title{Sample heterozygotes}
 \usage{
-sample_hets(Y, idx)
+sample_hets(Y)
 }
 \arguments{
 \item{Y}{matrix n x p of genotypes}
-
-\item{idx}{row indicies of people you want to het sample}
 }
 \value{
-Y_samp matrix of het sampled genotypes
+Y matrix of het sampled genotypes
 }
