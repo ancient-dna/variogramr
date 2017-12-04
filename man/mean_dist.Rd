@@ -10,7 +10,8 @@ mean_dist(y)
 \item{y}{NumericMatrix n x p data matrix}
 }
 \value{
-d n x n euclidian distance matrix
+res list storing d the n x n euclidian distance matrix and
+        m the n x n matrix storing the number of non-missing features
 }
 \description{
 Computes the mean euclidian distance matrix

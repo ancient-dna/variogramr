@@ -3,58 +3,6 @@
 
 using namespace Rcpp;
 
-//' @title Mean euclidean distance for a single pair of observations
-//'
-//' @description computes the mean euclidian distance
-//'              for a single pair of samples all features
-//'
-//' @param y_i NumericVector p data vector for sample i
-//' @param y_j NumericVector p data vector for sample j
-//'
-//' @return d_ij euclidian distance normalized by number of non-missing
-//'         features
-//'
-//' @export
-// [[Rcpp::export]]
-double mean_dist_pair(NumericVector y_i, NumericVector y_j) {
-
-    // number of features
-    int p = y_i.length();
-
-    // number of non-missing features
-    double m = 0.0;
-
-    // distance for pair of observations
-    double d_ij = 0.0;
-
-    // loop over features
-    for (int k = 0; k < p; k++) {
-
-        // check that both features are non-missing
-        if ((!R_IsNA(y_i(k))) && (!R_IsNA(y_j(k)))) {
-
-            // add to euclidian distiance
-            d_ij = d_ij + pow((y_i(k) - y_j(k)), 2);
-
-            // count non-missing features
-            m = m + 1.0;
-
-        }
-
-    }
-
-    // normalize by number of non-missing features
-    if (m != 0.0) {
-        d_ij = d_ij / m;
-    }
-    else {
-        d_ij = NA_REAL;
-    }
-
-    return d_ij;
-
-}
-
 //' @title Mean euclidean distance
 //'
 //' @description Computes the mean euclidian distance matrix
@@ -64,29 +12,48 @@ double mean_dist_pair(NumericVector y_i, NumericVector y_j) {
 //'
 //' @param y NumericMatrix n x p data matrix
 //'
-//' @return d n x n euclidian distance matrix
+//' @return res list storing d the n x n euclidian distance matrix and
+//'         m the n x n matrix storing the number of non-missing features
 //'
 //' @export
 // [[Rcpp::export]]
-NumericMatrix mean_dist(NumericMatrix y) {
+List mean_dist(NumericMatrix y) {
 
     // number of samples
     int n = y.nrow();
+    int p = y.ncol();
+    NumericVector e;
 
-    // distance matrix
+    // euclidian distance matrix
     NumericMatrix d(n, n);
+    
+    // matrix storing number of non-missing features
+    NumericMatrix m(n, n);
 
-    // loop over all pairs of samples
+    // return list
+    List res;
+
+    // loop over pairs to need to compute full distance matrix
     for (int i = 0; i < (n - 1); i++) {
         for (int j = (i+1); j < n; j++) {
 
+            // compute error for pair i and j
+            e = y(i,_) - y(j,_);
+
+            // compute number of non-missing sites
+            m(i, j) = p - sum(is_na(e));
+            m(j, i) = m(i, j);
+
             // compute distance for each pair
-            d(i, j) = mean_dist_pair(y(i,_), y(j,_));
+            d(i, j) = sum(na_omit(e * e)) / m(i, j);;
             d(j, i) = d(i, j);
 
         }
     }
 
-    return d;
+    res["d"] = d;
+    res["m"] = m;
+
+    return res;
 
 }

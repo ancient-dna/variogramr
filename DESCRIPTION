@@ -13,7 +13,10 @@ Suggests:
 Imports:
     readr,
     ggplot2,
+    RcppParallel,
     Rcpp
 LinkingTo: 
+    RcppParallel,
     Rcpp
+SystemRequirements: GNU make
 RoxygenNote: 6.0.1
