@@ -14,7 +14,7 @@
 #'
 #' @export
 mean_dist_pair <- function(y_i, y_j) {
-    .Call('variogramr_mean_dist_pair', PACKAGE = 'variogramr', y_i, y_j)
+    .Call('_variogramr_mean_dist_pair', PACKAGE = 'variogramr', y_i, y_j)
 }
 
 #' @title Mean euclidean distance
@@ -30,6 +30,6 @@ mean_dist_pair <- function(y_i, y_j) {
 #'
 #' @export
 mean_dist <- function(y) {
-    .Call('variogramr_mean_dist', PACKAGE = 'variogramr', y)
+    .Call('_variogramr_mean_dist', PACKAGE = 'variogramr', y)
 }
 
