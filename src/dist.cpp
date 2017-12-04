@@ -1,92 +1,92 @@
 #include <Rcpp.h>
-#include <math.h>
-
 using namespace Rcpp;
 
-//' @title Mean euclidean distance for a single pair of observations
-//'
-//' @description computes the mean euclidian distance
-//'              for a single pair of samples all features
-//'
-//' @param y_i NumericVector p data vector for sample i
-//' @param y_j NumericVector p data vector for sample j
-//'
-//' @return d_ij euclidian distance normalized by number of non-missing
-//'         features
-//'
-//' @export
-// [[Rcpp::export]]
-double mean_dist_pair(NumericVector y_i, NumericVector y_j) {
+// [[Rcpp::depends(RcppParallel)]]
+#include <RcppParallel.h>
+using namespace RcppParallel;
 
-    // number of features
-    int p = y_i.length();
+struct Distance : public Worker {
+    
+    // p x n matrix of observed data    
+    const RMatrix<double> y;
+    
+    // n x n unnormalized distance matrix
+    RMatrix<double> q;
+    
+    // n x n matrix storing number of non-missing sites
+    RMatrix<double> m;
+    
+    const int n; // number of samples
+    const int p; // number of features
+    
+    Distance(const NumericMatrix _y, NumericMatrix _q, NumericMatrix _m)
+        : y(_y), q(_q), m(_m), n(_y.ncol()), p(_y.nrow()) {}
+    
+    void operator()(std::size_t begin, std::size_t end) {
+        
+        // loop over pairs
+        for (std::size_t i = begin; i < end; i++) {
+            for (std::size_t j = 0; j <= i; j++) {
+                
+                // extract column i
+                RMatrix<double>::Column y_i = y.column(i);
+                
+                // extract column j
+                RMatrix<double>::Column y_j = y.column(j);
 
-    // number of non-missing features
-    double m = 0.0;
-
-    // distance for pair of observations
-    double d_ij = 0.0;
-
-    // loop over features
-    for (int k = 0; k < p; k++) {
-
-        // check that both features are non-missing
-        if ((!R_IsNA(y_i(k))) && (!R_IsNA(y_j(k)))) {
-
-            // add to euclidian distiance
-            d_ij = d_ij + pow((y_i(k) - y_j(k)), 2);
-
-            // count non-missing features
-            m = m + 1.0;
-
+                // loop over features
+                for(int k=0; k < p; k++){
+                    
+                    // compute error
+                    double e = y_i[k] - y_j[k];
+                    if(!std::isnan(e)){
+                        
+                        // count number of non-missing features
+                        m(i,j) ++;
+                        m(j,i) = m(i,j);
+                        
+                        // compute distance
+                        q(i,j) += e * e;
+                        q(j,i) = q(i,j);
+                        
+                    }
+                }
+                
+            }
         }
-
     }
+};
 
-    // normalize by number of non-missing features
-    if (m != 0.0) {
-        d_ij = d_ij / m;
-    }
-    else {
-        d_ij = NA_REAL;
-    }
-
-    return d_ij;
-
-}
-
-//' @title Mean euclidean distance
+//' @title Mean euclidean distance in parallel
 //'
 //' @description Computes the mean euclidian distance matrix
 //'              for all pairs of samples accross all the features.
 //'              This only includes non-missing feature for both pairs.
 //'
 //'
-//' @param y NumericMatrix n x p data matrix
+//' @param y NumericMatrix p x n data matrix
 //'
-//' @return d n x n euclidian distance matrix
+//' @return res list storing Q the n x n unormalized euclidian distance matrix 
+//'         and M the n x n matrix storing the number of non-missing features
 //'
 //' @export
 // [[Rcpp::export]]
-NumericMatrix mean_dist(NumericMatrix y) {
-
+List mean_dist(NumericMatrix y) {
+    
     // number of samples
-    int n = y.nrow();
-
-    // distance matrix
-    NumericMatrix d(n, n);
-
-    // loop over all pairs of samples
-    for (int i = 0; i < (n - 1); i++) {
-        for (int j = (i+1); j < n; j++) {
-
-            // compute distance for each pair
-            d(i, j) = mean_dist_pair(y(i,_), y(j,_));
-            d(j, i) = d(i, j);
-
-        }
-    }
-
-    return d;
-
+    int n = y.ncol();
+    
+    // n x n unormalized distance matrix
+    NumericMatrix q(n, n);
+    
+    // n x n matrix of non-missing counts
+    NumericMatrix m(n, n);
+    
+    Distance Distance(y, q, m);
+    parallelFor(0, n, Distance);
+    
+    // return list
+    return List::create(Named("Q") = q, 
+                        Named("M") = m);
+    
 }

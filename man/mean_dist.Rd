@@ -2,15 +2,16 @@
 % Please edit documentation in R/RcppExports.R
 \name{mean_dist}
 \alias{mean_dist}
-\title{Mean euclidean distance}
+\title{Mean euclidean distance in parallel}
 \usage{
 mean_dist(y)
 }
 \arguments{
-\item{y}{NumericMatrix n x p data matrix}
+\item{y}{NumericMatrix p x n data matrix}
 }
 \value{
-d n x n euclidian distance matrix
+res list storing Q the n x n unormalized euclidian distance matrix 
+        and M the n x n matrix storing the number of non-missing features
 }
 \description{
 Computes the mean euclidian distance matrix
