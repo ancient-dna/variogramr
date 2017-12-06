@@ -11,7 +11,7 @@
 #'
 #' @return vg a list
 #' @export
-gen.variogram.phylin <-
+gen.variogram.classic <-
   function(x, y, lag = mean(x, na.rm = TRUE)/sqrt(nrow(x)), range = max(x, na.rm=TRUE)) {
 
     # some variable checking
@@ -30,26 +30,17 @@ gen.variogram.phylin <-
     
     yy <- y[which(x < range & upper.tri(y) & !is.na(x) & !is.na(y))]
     xx <- x[which(x < range & upper.tri(y) & !is.na(x) & !is.na(y))]
-
+    bins <- rep(0, length(xx))
     lagv <- seq(0, range, lag)
-    gamma <- n <- rep(NA, length(lagv))
     tol = lag/2
-
     for (i in 1:length(lagv) )
     {
       l <- lagv[i]
       il <- which(xx > l-tol & xx <= l+tol, arr.ind=TRUE)
-      n[i] <- length(il)
-      lagv[i] <- mean(xx[il])
-      if (n[i] != 0) {
-        gamma[i] <- sum(yy[il])/n[i]
-      } else {
-        gamma[i] <- lagv[i] <- NA
-        
-      }
+      bins[il] <- as.factor(i)
     }
 
-    vg <- list(x=xx, y=yy, lag=lagv, gamma=gamma, n=n)
+    vg <- data.frame(x_distance = xx, y_distance=yy, bins=bins)
     vg
   }
 
@@ -85,10 +76,7 @@ gen.variogram <-
         xx <- x[which(x < range & upper.tri(y) & !is.na(x) & !is.na(y))]
 
         b=bins(xx, target.bins = target.bins, minpts = minpts)
-        nf = cut(xx, bins.getvals(b), labels = names(b$binct), maxpt = range)
-        gamma = tapply(yy, nf, mean)
-        lag=tapply(xx, nf, mean)
-
-        vg <- list(x=xx, y=yy, lag=lag, gamma=gamma, n=b$binct)
+        
+        vg <- data.frame(x_distance = xx, y_distance=yy, bins=cut(xx, bins.getvals(b), labels = names(b$binct), maxpt = range))
         vg
     }
