@@ -7,18 +7,18 @@ using namespace Rcpp;
 
 // mean_dist
 List mean_dist(NumericMatrix y);
-RcppExport SEXP variogramr_mean_dist(SEXP ySEXP) {
-    BEGIN_RCPP
+RcppExport SEXP _variogramr_mean_dist(SEXP ySEXP) {
+BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type y(ySEXP);
     rcpp_result_gen = Rcpp::wrap(mean_dist(y));
     return rcpp_result_gen;
-    END_RCPP
+END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"variogramr_mean_dist", (DL_FUNC) &variogramr_mean_dist, 1},
+    {"_variogramr_mean_dist", (DL_FUNC) &_variogramr_mean_dist, 1},
     {NULL, NULL, 0}
 };
 
