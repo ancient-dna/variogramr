@@ -5,7 +5,9 @@
 #' @return nothing
 #' @export
 plot.variogram <- function(vg){
-  plot(vg$lag, vg$gamma, xlab = "lag (h)", ylab = "E[D(h)^2]", main = "semivariogram",
+  lag   <- vg %>% group_by(bins) %>% summarise(avg=mean(x_dist))
+  gamma <- vg %>% group_by(bins) %>% summarise(avg=mean(y_dist))
+  plot(lag, gamma, xlab = "lag (h)", ylab = "E[D(h)^2]", main = "semivariogram",
        pch =20, type = "l")
-  text(vg$lag, vg$gamma, labels = vg$n)
+  text(lag, gamma)
 }
