@@ -78,5 +78,6 @@ gen.variogram <-
         b=bins(xx, target.bins = target.bins, minpts = minpts)
         
         vg <- data.frame(x_dist = xx, y_dist=yy, bins=cut(xx, bins.getvals(b), labels = names(b$binct), maxpt = range))
+        levels(vg$bins) = 1:length(levels(vg$bins))
         vg
     }
