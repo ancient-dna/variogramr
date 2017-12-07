@@ -2,11 +2,12 @@
 
 S3method(plot,variogram)
 export(gen.variogram)
-export(gen.variogram.phylin)
+export(gen.variogram.classic)
 export(mean_dist)
 export(read_geno)
 export(sample_hets)
 import(binr)
+import(dplyr)
 import(readr)
 importFrom(Rcpp,sourceCpp)
 useDynLib(variogramr)

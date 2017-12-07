@@ -37,10 +37,10 @@ gen.variogram.classic <-
     {
       l <- lagv[i]
       il <- which(xx > l-tol & xx <= l+tol, arr.ind=TRUE)
-      bins[il] <- as.factor(i)
+      bins[il] <- i
     }
-
-    vg <- data.frame(x_distance = xx, y_distance=yy, bins=bins)
+    bins <- as.factor(bins)
+    vg <- data.frame(x_dist = xx, y_dist=yy, bins=bins)
     vg
   }
 
@@ -77,6 +77,6 @@ gen.variogram <-
 
         b=bins(xx, target.bins = target.bins, minpts = minpts)
         
-        vg <- data.frame(x_distance = xx, y_distance=yy, bins=cut(xx, bins.getvals(b), labels = names(b$binct), maxpt = range))
+        vg <- data.frame(x_dist = xx, y_dist=yy, bins=cut(xx, bins.getvals(b), labels = names(b$binct), maxpt = range))
         vg
     }
