@@ -8,10 +8,11 @@
 #' @return Y matrix of genotypes
 #' @export
 read_geno <- function(geno_path, n){
-    df <- read_fwf(geno_path, progress=TRUE, na='9', fwf_widths(rep(1, n)))
-    Y <- as.matrix(df)
+    
+    Y <- as.matrix(read_fwf(geno_path, progress=TRUE, fwf_widths(rep(1, n))))
     colnames(Y) <- NULL
-
+    Y[Y==9] <- NA
+    
     return(Y)
 }
 
@@ -22,6 +23,7 @@ read_geno <- function(geno_path, n){
 #' @return Y matrix of het sampled genotypes
 #' @export
 sample_hets <- function(Y){
+    
     p <- sum(Y==1, na.rm=TRUE)
     samps <- as.vector(sample(c(0, 2), size=p, replace=TRUE))
     Y[!is.na(Y) & Y == 1] <- samps

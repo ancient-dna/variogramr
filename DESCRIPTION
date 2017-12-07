@@ -13,6 +13,8 @@ Suggests:
 Imports:
     readr,
     ggplot2,
+    binr,
+    dplyr,
     RcppParallel,
     Rcpp
 LinkingTo: 
