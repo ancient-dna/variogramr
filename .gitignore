@@ -33,3 +33,7 @@ vignettes/*.pdf
 *.knit.md
 
 analysis/*
+
+*.DS_Store
+
+*.Rd
